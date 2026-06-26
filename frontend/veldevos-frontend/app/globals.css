@@ -1,0 +1,40 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #e8eaed;
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-width: 900px) {
+  .dashboard-cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .dashboard-bottom-grid { grid-template-columns: 1fr !important; }
+  .cards-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+@media (max-width: 600px) {
+  .dashboard-cards-grid { grid-template-columns: 1fr !important; }
+  .cards-grid-3 { grid-template-columns: 1fr !important; }
+
+  /* Header: esconde labels do nav, só ícones */
+  .nav-label-hide { display: none !important; }
+
+  /* Botão "Novo X" no mobile: só ícone, sem texto */
+  .btn-label-hide { display: none !important; }
+
+  /* TopBar: alinha melhor no mobile */
+  .top-bar-mobile {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Tabela financeiro: scroll horizontal */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
