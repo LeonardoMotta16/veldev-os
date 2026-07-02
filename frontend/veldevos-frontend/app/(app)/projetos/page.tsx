@@ -91,7 +91,7 @@ export default function ProjetosPage() {
         ) : projetosFiltrados.length === 0 ? (
           <div style={{ gridColumn: "1/-1", ...s.emptyState }}>
             <p style={s.emptyText}>Nenhum projeto encontrado.</p>
-            <p style={s.emptySubText}>Clique em "+ Novo projeto" para começar.</p>
+            <p style={s.emptySubText}>Clique em &quot;+ Novo projeto&quot; para começar.</p>
           </div>
         ) : projetosFiltrados.map((projeto) => {
           const sc = statusConfig[projeto.status] ?? statusConfig.ATIVO;

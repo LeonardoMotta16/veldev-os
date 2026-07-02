@@ -3,7 +3,6 @@
 import { useState } from "react";
 import api from "@/lib/api";
 
-const ACCENT = "#0F2D6B";
 
 export interface FormDataTransacao {
   tipo: "RECEITA" | "DESPESA";
@@ -69,7 +68,6 @@ export default function ModalNovaTransacao({ onClose, onSalvar }: Props) {
 
   const categorias = form.tipo === "RECEITA" ? categoriasReceita : categoriasDespesa;
   const corTipo = form.tipo === "RECEITA" ? "#3B6D11" : "#854F0B";
-  const bgTipo = form.tipo === "RECEITA" ? "#EAF3DE" : "#FAEEDA";
 
   return (
     <div style={s.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
