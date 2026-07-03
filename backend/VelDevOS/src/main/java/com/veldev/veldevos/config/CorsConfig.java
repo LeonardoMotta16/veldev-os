@@ -12,6 +12,7 @@ public class CorsConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("https://veldev-os.onrender.com");
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
