@@ -19,9 +19,14 @@ export interface FormDataProjeto {
   tarefas: Tarefa[];
 }
 
+export interface ProjetoExistente extends FormDataProjeto {
+  id: number;
+}
+
 interface Props {
   onClose: () => void;
   onSalvar: (dados: FormDataProjeto) => void;
+  projetoExistente?: ProjetoExistente;
 }
 
 const s: Record<string, React.CSSProperties> = {
@@ -53,8 +58,20 @@ const s: Record<string, React.CSSProperties> = {
 
 let nextId = 1;
 
-export default function ModalNovoProjeto({ onClose, onSalvar }: Props) {
-  const [form, setForm] = useState<FormDataProjeto>({ nome: "", descricao: "", status: "ATIVO", valor: "", tarefas: [] });
+export default function ModalNovoProjeto({ onClose, onSalvar, projetoExistente }: Props) {
+  const modoEdicao = !!projetoExistente;
+
+  const [form, setForm] = useState<FormDataProjeto>(
+    projetoExistente
+      ? {
+          nome: projetoExistente.nome,
+          descricao: projetoExistente.descricao,
+          status: projetoExistente.status,
+          valor: projetoExistente.valor,
+          tarefas: projetoExistente.tarefas,
+        }
+      : { nome: "", descricao: "", status: "ATIVO", valor: "", tarefas: [] }
+  );
   const [novaTarefa, setNovaTarefa] = useState("");
 
   function setField<K extends keyof FormDataProjeto>(key: K, value: FormDataProjeto[K]) {
@@ -70,12 +87,18 @@ export default function ModalNovoProjeto({ onClose, onSalvar }: Props) {
 
   async function handleSalvar() {
     if (!form.nome.trim()) return;
-    const res = await api.post("/api/projetos", {
+
+    const payload = {
       nome: form.nome,
       descricao: form.descricao,
       status: form.status,
       valor: parseFloat(form.valor) || 0,
-    });
+    };
+
+    const res = modoEdicao
+      ? await api.put(`/api/projetos/${projetoExistente!.id}`, payload)
+      : await api.post("/api/projetos", payload);
+
     onSalvar({ ...form, ...res.data });
     onClose();
   }
@@ -84,7 +107,7 @@ export default function ModalNovoProjeto({ onClose, onSalvar }: Props) {
     <div style={s.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div style={s.modal}>
         <div style={s.header}>
-          <p style={s.titulo}>Novo projeto</p>
+          <p style={s.titulo}>{modoEdicao ? "Editar projeto" : "Novo projeto"}</p>
           <button style={s.closeBtn} onClick={onClose}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -147,7 +170,7 @@ export default function ModalNovoProjeto({ onClose, onSalvar }: Props) {
           <span style={s.progressInfo}>{form.tarefas.length > 0 ? `${form.tarefas.length} tarefa(s) cadastrada(s)` : "Nenhuma tarefa ainda"}</span>
           <div style={s.footerBtns}>
             <button style={s.btnCancel} onClick={onClose}>Cancelar</button>
-            <button style={s.btnSalvar} onClick={handleSalvar}>Salvar projeto</button>
+            <button style={s.btnSalvar} onClick={handleSalvar}>{modoEdicao ? "Salvar alterações" : "Salvar projeto"}</button>
           </div>
         </div>
       </div>
