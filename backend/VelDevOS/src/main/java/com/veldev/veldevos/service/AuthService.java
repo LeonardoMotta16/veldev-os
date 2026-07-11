@@ -2,6 +2,7 @@ package com.veldev.veldevos.service;
 
 import com.veldev.veldevos.dto.LoginRequestDTO;
 import com.veldev.veldevos.dto.LoginResponseDTO;
+import com.veldev.veldevos.dto.RegisterRequestDTO;
 import com.veldev.veldevos.model.Usuario;
 import com.veldev.veldevos.repository.UsuarioRepository;
 import com.veldev.veldevos.security.JwtService;
@@ -27,5 +28,17 @@ public class AuthService {
 
         String token = jwtService.gerarToken(usuario.getEmail());
         return new LoginResponseDTO(token, usuario.getNome(), usuario.getEmail());
+    }
+    public Usuario register(RegisterRequestDTO dto) {
+        if (usuarioRepository.findByEmail(dto.email()).isPresent()) {
+            throw new RuntimeException("E-mail já cadastrado");
+        }
+
+        Usuario usuario = new Usuario();
+        usuario.setNome(dto.nome());
+        usuario.setEmail(dto.email());
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+
+        return usuarioRepository.save(usuario);
     }
 }
