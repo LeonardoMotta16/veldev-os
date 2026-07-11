@@ -71,7 +71,7 @@ export default function ClientesPage() {
         ) : clientes.length === 0 ? (
           <div style={{ gridColumn: "1/-1", ...s.emptyState }}>
             <p style={s.emptyText}>Nenhum cliente cadastrado ainda.</p>
-            <p style={s.emptySubText}>Clique em &quot;+ Novo cliente&quot; para começar.</p>
+            <p style={s.emptySubText}>Clique em &quot;gi+ Novo cliente&quot; para começar.</p>
           </div>
         ) : clientes.map((cliente) => (
           <div key={cliente.id} style={s.card} onClick={() => setClienteSelecionado(cliente)}>
