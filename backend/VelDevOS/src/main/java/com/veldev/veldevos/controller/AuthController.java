@@ -3,7 +3,6 @@ package com.veldev.veldevos.controller;
 import com.veldev.veldevos.dto.LoginRequestDTO;
 import com.veldev.veldevos.dto.LoginResponseDTO;
 import com.veldev.veldevos.dto.RegisterRequestDTO;
-import com.veldev.veldevos.model.Usuario;
 import com.veldev.veldevos.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
