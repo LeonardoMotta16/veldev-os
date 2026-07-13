@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import api from "@/lib/api";
-import ModalNovoProjeto, { FormDataProjeto } from "@/app/components/ModalNovoProjeto";
+import ModalNovoProjeto, { FormDataProjeto, ProjetoExistente } from "@/app/components/ModalNovoProjeto";
 
 const ACCENT = "#0F2D6B";
 const ACCENT_LIGHT = "#E8EDF8";
@@ -32,12 +32,25 @@ const statusConfig: Record<string, { bg: string; color: string; label: string }>
 
 function fmtBRL(v: number) { return v?.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) ?? "—"; }
 
+// 👇 Converte o Projeto (usado na listagem) para o formato que o ModalNovoProjeto espera
+function paraProjetoExistente(p: Projeto): ProjetoExistente {
+  return {
+    id: p.id,
+    nome: p.nome,
+    descricao: p.descricao,
+    status: p.status as FormDataProjeto["status"],
+    valor: String(p.valor),
+    tarefas: [], // a listagem não carrega as tarefas; o modal parte vazio na edição
+  };
+}
+
 export default function ProjetosPage() {
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [filtroAtivo, setFiltroAtivo] = useState<Filtro>("Todos");
   const [carregando, setCarregando] = useState(true);
   const [modalAberto, setModalAberto] = useState(false);
   const [projetoSelecionado, setProjetoSelecionado] = useState<Projeto | null>(null);
+  const [projetoEmEdicao, setProjetoEmEdicao] = useState<Projeto | null>(null); // 👈 novo estado
 
   useEffect(() => {
     api.get("/api/projetos")
@@ -56,6 +69,17 @@ export default function ProjetosPage() {
       valor: parseFloat(dados.valor) || 0,
     };
     setProjetos((prev) => [novoProjeto, ...prev]);
+  }
+
+  // 👇 novo: atualiza o projeto editado na lista local
+  function handleEditar(id: number, dados: FormDataProjeto) {
+    setProjetos((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? { ...p, nome: dados.nome, descricao: dados.descricao, status: dados.status, valor: parseFloat(dados.valor) || 0 }
+          : p
+      )
+    );
   }
 
   async function handleDeletar(id: number) {
@@ -124,6 +148,7 @@ export default function ProjetosPage() {
         </div>
       </div>
 
+      {/* Modal de criação */}
       {modalAberto && (
         <ModalNovoProjeto
           onClose={() => setModalAberto(false)}
@@ -131,7 +156,16 @@ export default function ProjetosPage() {
         />
       )}
 
-      {/* Modal detalhe projeto (inline simples por enquanto) */}
+      {/* Modal de edição — reaproveita o mesmo componente, em modo edit */}
+      {projetoEmEdicao && (
+        <ModalNovoProjeto
+          projetoExistente={paraProjetoExistente(projetoEmEdicao)}
+          onClose={() => setProjetoEmEdicao(null)}
+          onSalvar={(dados) => { handleEditar(projetoEmEdicao.id, dados); setProjetoEmEdicao(null); }}
+        />
+      )}
+
+      {/* Modal detalhe projeto (inline) */}
       {projetoSelecionado && (
         <div style={s.overlay}>
           <div style={s.modal}>
@@ -149,6 +183,7 @@ export default function ProjetosPage() {
             <p style={{ fontSize: "13px", color: "#999", margin: "0 0 8px" }}>{projetoSelecionado.descricao || "Sem descrição"}</p>
             <p style={{ fontSize: "13px", color: "#555", margin: "0 0 4px" }}>Valor: <strong style={{ color: ACCENT }}>{fmtBRL(projetoSelecionado.valor)}</strong></p>
             <div style={s.modalActions}>
+              <button style={{ ...s.btnCancel, color: ACCENT, borderColor: ACCENT }} onClick={() => { setProjetoEmEdicao(projetoSelecionado); setProjetoSelecionado(null); }}>Editar</button>
               <button style={{ ...s.btnCancel, color: "#c0392b", borderColor: "#c0392b" }} onClick={() => handleDeletar(projetoSelecionado.id)}>Excluir</button>
               <button style={s.btnCancel} onClick={() => setProjetoSelecionado(null)}>Fechar</button>
             </div>
